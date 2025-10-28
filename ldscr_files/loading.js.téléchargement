@@ -1,0 +1,153 @@
+var langs = {
+	fr: {
+		init: "Chargement en cours...",
+		mounting: "Addons du Workshop: Chargement",
+		ws_done: "Addons du Workshop: Terminé",
+		sending_info: "Presque là...",
+		ws_adds: "Addons du Workshop: ",
+		checking: "Vérification ",
+		unpacking: "Extraction ",
+		loading: "Téléchargement ",
+		fastdl: "Fichiers FastDL: ",
+		bsp: "Si la barre de chargement peut paraître immobile ou bloquée, ne vous inquiétez pas, tout va bien",
+		resources: "Chargement des ressources",
+		hints: [
+			"Si la vérification des addons du Workshop est trop longue, fermez Garry's Mod et redémarrez Steam.",
+			"Vous n'êtez pas limités aux jobs dans la liste du menu F4, vous pouvez très bien être propriétaire de cinéma ou revendeur de biens.",
+			"Ne vous inquiétez pas en cas de panne de serveur - il se redémarrera en peu de temps et vous aurez tous vos objets, votre emploi et position restaurés automatiquement.",
+			"Assurez-vous de vérifier les règles et guide de jeu. Vous pouvez également lire nos nouvelles - il y a toujours quelque chose d'intéressant au sujet de prochaines mises à jour et plus.",
+			"Il est totalement gratuit de jouer sur les serveurs Project Nexus, le seul prérequis est une copie licensée de Garry's Mod, cependant vous pouvez toujours vous faire plaisir avec des objets spéciaux dans notre boutique. Pour quelques modes de jeu comme Project : Nexux, il est possible d'acheter un abonnement Premium d'un mois. Le Premium rend votre expérience plaisante, facile et confortable.",
+			"Nous avons créé d'adorables accessoires pour votre personnage en jeu, que vous pouvez porter sur chacun de nos serveurs. Pour voir la liste complète d'objets, utilisez le menu F4 (sur DarkRP) our \"Shop\" dans le menu Échap.",
+		]
+	}
+}
+
+var lang = langs[location.hash.substr(1)] || langs["fr"]
+
+var wsaddons = 0
+var wscur = 0
+var filesneeded = 0
+var filescur = 0
+var already = []
+
+var logDiv = document.getElementById("log")
+function Log(str, str2, str3) {
+	logDiv.insertAdjacentHTML("beforeend", str + "<br>")
+	if (str2)
+		str += "<br>" + str2
+	if (str3)
+		str += "<br>" + str3
+	document.getElementById("download-notation").innerHTML = str
+	//console.log(str)
+	logDiv.scrollTop = logDiv.scrollHeight
+}
+Log(lang.init);
+
+function SetProgress(num) {
+	document.getElementById("progressbar").style.width = (num * 100) + '%'
+}
+
+function UrlExists(url) {
+	var http = new XMLHttpRequest();
+	http.open('HEAD', url, false);
+	http.send();
+	return http.status == 200;
+}
+function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
+	var image = "default"
+	if (UrlExists("maps_view/" + mapname.toLowerCase() + ".jpg"))
+		image = mapname.toLowerCase()
+	else if (UrlExists("maps_view/" + gamemode.toLowerCase() + ".jpg"))
+		image = gamemode.toLowerCase()
+	document.getElementsByTagName('body')[0].style.backgroundImage = "url(\"maps_view/" + image + ".jpg\")"
+
+	if (gamemode != "darkrp") {
+		document.getElementsByClassName("hint")[0].style.display = "none";
+		document.getElementsByClassName("announce")[0].style.display = "none";
+	}
+}
+
+function SetFilesNeeded(needed) {
+	//console.log("SetFilesNeeded: " + needed)
+	filesneeded = needed
+}
+
+function SetFilesTotal(total) {
+	//console.log("SetFilesTotal: " + total)
+}
+
+function SetStatusChanged(status) {
+	//console.log("SetStatusChanged: " + status)
+
+	switch (status) {
+		case "Mounting Addons":
+			SetProgress(1)
+			Log(lang.mounting)
+			break
+		case "Workshop Complete":
+			SetProgress(1)
+			Log(lang.ws_done)
+			filesneeded -= wscur;
+			break
+		case "Sending client info...":
+			SetProgress(1)
+			Log(lang.sending_info)
+			break
+	}
+
+	if (status.substr(0, 24) == "Getting Addon info for #")
+	{
+		wsaddons++
+		Log(lang.ws_adds + wsaddons, lang.checking + status.substr(24))
+	}
+
+	if (status.substr(0, 5) == "Found" && already.indexOf(status.substring(7, status.length - 1)) < 0)
+	{
+		wscur++
+		Log(lang.ws_adds + wscur + "/" + wsaddons)
+		SetProgress(wscur / wsaddons)
+	}
+
+	if (status.substr(0, 10) == "Extracting")
+		Log(lang.ws_adds + wscur + "/" + wsaddons, lang.unpacking + status.substring(12, status.length - 1))
+
+	if (status.substr(0, 9) == "Extracted")
+	{
+		SetProgress(wscur / wsaddons)
+		Log(lang.ws_adds + wscur + "/" + wsaddons)
+		already.push(status.substring(11, status.length - 1))
+	}
+}
+
+function DownloadingFile(name) {
+	//console.log("DownloadingFile: " + name)
+	var pos = name.indexOf("via Workshop")
+	if (pos >= 0)
+	{
+		wscur++
+		Log(lang.ws_adds + wscur + "/" + wsaddons, lang.loading + name.substring(1, pos - 2))
+	}
+	else
+	{
+		SetProgress(filescur / filesneeded)
+		filescur++
+		if (name.substr(-4) == ".bsp")
+			Log(lang.fastdl + filescur + "/" + filesneeded, lang.loading + name, lang.bsp)
+		else if (filescur == filesneeded)
+			Log(lang.fastdl + filescur + "/" + filesneeded, lang.loading + name, lang.resources)
+		else
+			Log(lang.fastdl + filescur + "/" + filesneeded, lang.loading + name)
+	}
+}
+
+var hints = lang.hints
+var curhint = 0
+
+function randomHint() {
+	document.getElementsByClassName("hint")[0].innerHTML = hints[curhint]
+	curhint = (curhint + 1)%hints.length
+}
+
+randomHint()
+
+setInterval(randomHint, 10000)
