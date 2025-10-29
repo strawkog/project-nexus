@@ -13,11 +13,11 @@ var langs = {
 		resources: "Chargement des ressources",
 		hints: [
 			"Si la vérification des addons du Workshop est trop longue, fermez Garry's Mod et redémarrez Steam.",
-			"Vous n'êtez pas limités aux jobs dans la liste du menu F4, vous pouvez très bien être propriétaire de cinéma ou revendeur de biens.",
-			"Ne vous inquiétez pas en cas de panne de serveur - il se redémarrera en peu de temps et vous aurez tous vos objets, votre emploi et position restaurés automatiquement.",
-			"Assurez-vous de vérifier les règles et guide de jeu. Vous pouvez également lire nos nouvelles - il y a toujours quelque chose d'intéressant au sujet de prochaines mises à jour et plus.",
-			"Il est totalement gratuit de jouer sur les serveurs Project Nexus, le seul prérequis est une copie licensée de Garry's Mod, cependant vous pouvez toujours vous faire plaisir avec des objets spéciaux dans notre boutique. Pour quelques modes de jeu comme Project : Nexux, il est possible d'acheter un abonnement Premium d'un mois. Le Premium rend votre expérience plaisante, facile et confortable.",
-			"Nous avons créé d'adorables accessoires pour votre personnage en jeu, que vous pouvez porter sur chacun de nos serveurs. Pour voir la liste complète d'objets, utilisez le menu F4 (sur DarkRP) our \"Shop\" dans le menu Échap.",
+			"Vous n'êtez pas limités aux jobs dans la liste du menu F4, vous pouvez très bien être propriétaire d'entreprises ou revendeur de biens.",
+			"Ne vous inquiétez pas si il n'y pas de cuisinier sur le serveur, vous n'aurez pas faim !",
+			"Assurez-vous de vérifier le règlement. Vous pouvez également lire nos annonces, il y a toujours quelque chose d'intéressant au sujet de prochaines mises à jour et plus.",
+			"Il est totalement gratuit de jouer sur les serveurs Project Nexus, le seul prérequis est une copie licensée de Garry's Mod, il est possible d'acheter un abonnement Premium d'un mois. Le Premium rend votre expérience plaisante, facile et confortable.",
+			"Vous pouvez rejoindre notre Discord, il est dans le F4, et le échap menu.",
 		]
 	}
 }
@@ -54,13 +54,6 @@ function UrlExists(url) {
 	return http.status == 200;
 }
 function GameDetails(servername, serverurl, mapname, maxplayers, steamid, gamemode) {
-	var image = "default"
-	if (UrlExists("maps_view/" + mapname.toLowerCase() + ".jpg"))
-		image = mapname.toLowerCase()
-	else if (UrlExists("maps_view/" + gamemode.toLowerCase() + ".jpg"))
-		image = gamemode.toLowerCase()
-	document.getElementsByTagName('body')[0].style.backgroundImage = "url(\"maps_view/" + image + ".jpg\")"
-
 	if (gamemode != "darkrp") {
 		document.getElementsByClassName("hint")[0].style.display = "none";
 		document.getElementsByClassName("announce")[0].style.display = "none";
