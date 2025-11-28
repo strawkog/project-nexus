@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Nexus - HL2RP Loading Screen</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e1a;
+            color: #c5d9e8;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        #background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: radial-gradient(ellipse at center, #0d1825 0%, #0a0e1a 100%);
+            overflow: hidden;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 150, 255, 0.02) 0px,
+                rgba(0, 150, 255, 0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            animation: scanlineMove 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanlineMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100px); }
+        }
+
+        #particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(0, 150, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 120, 200, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 120, 200, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        #container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px;
+        }
+
+        #header {
+            text-align: center;
+            animation: fadeInDown 1.2s ease;
+        }
+
+        #server-name {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #005baa;
+            text-shadow: 0 0 30px rgba(0, 91, 170, 0.8), 0 0 60px rgba(0, 91, 170, 0.4);
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        #server-subtitle {
+            font-size: 1.4rem;
+            color: #6b9dc4;
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+
+        #server-map {
+            font-size: 1rem;
+            color: #4a7a9a;
+            margin-top: 10px;
+            font-weight: 300;
+        }
+
+        #center-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 1.5s ease;
+        }
+
+        #loading-logo {
+            width: 220px;
+            height: 220px;
+            position: relative;
+            margin-bottom: 50px;
+            filter: drop-shadow(0 0 40px rgba(0, 91, 170, 0.6));
+        }
+
+        .logo-ring {
+            position: absolute;
+            border: 2px solid rgba(0, 91, 170, 0.4);
+            border-radius: 50%;
+            animation: rotate 5s linear infinite;
+        }
+
+        .ring-1 {
+            width: 220px;
+            height: 220px;
+            top: 0;
+            left: 0;
+            border-top-color: #005baa;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+        }
+
+        .ring-2 {
+            width: 170px;
+            height: 170px;
+            top: 25px;
+            left: 25px;
+            border-bottom-color: #0078d4;
+            border-left-color: transparent;
+            border-top-color: transparent;
+            animation-direction: reverse;
+            animation-duration: 4s;
+        }
+
+        .ring-3 {
+            width: 120px;
+            height: 120px;
+            top: 50px;
+            left: 50px;
+            border-right-color: #005baa;
+            border-top-color: transparent;
+            border-left-color: transparent;
+            animation-duration: 3s;
+        }
+
+        .logo-center {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            top: 75px;
+            left: 75px;
+            background-image: url('https://zupimages.net/up/25/48/09sw.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 50%;
+            box-shadow: 0 0 40px rgba(0, 91, 170, 0.9), 0 0 80px rgba(0, 91, 170, 0.5), inset 0 0 20px rgba(0, 91, 170, 0.3);
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 0.8; 
+                transform: scale(1);
+                box-shadow: 0 0 40px rgba(0, 91, 170, 0.9), 0 0 80px rgba(0, 91, 170, 0.5);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.08);
+                box-shadow: 0 0 60px rgba(0, 150, 255, 1), 0 0 120px rgba(0, 150, 255, 0.7);
+            }
+        }
+
+        #loading-status {
+            font-size: 1.4rem;
+            color: #5a9ec5;
+            text-align: center;
+            min-height: 35px;
+            animation: fadeText 3s ease-in-out infinite;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeText {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        #bottom-content {
+            animation: fadeInUp 1.2s ease;
+        }
+
+        #progress-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto 25px;
+        }
+
+        #progress-label {
+            text-align: center;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            color: #6b9dc4;
+            font-weight: 300;
+        }
+
+        #progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(10, 30, 50, 0.7);
+            border: 1px solid rgba(0, 91, 170, 0.4);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #003d7a 0%, #005baa 50%, #0078d4 100%);
+            background-size: 200% 100%;
+            box-shadow: 0 0 25px rgba(0, 120, 210, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: progressGlow 3s ease-in-out infinite;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 5px;
+        }
+
+        @keyframes progressGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            #server-name {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #container {
+                padding: 25px;
+            }
+
+            #server-name {
+                font-size: 2.2rem;
+            }
+
+            #server-subtitle {
+                font-size: 1.1rem;
+            }
+
+            #loading-logo {
+                width: 170px;
+                height: 170px;
+            }
+
+            .ring-1 {
+                width: 170px;
+                height: 170px;
+            }
+
+            .ring-2 {
+                width: 130px;
+                height: 130px;
+                top: 20px;
+                left: 20px;
+            }
+
+            .ring-3 {
+                width: 90px;
+                height: 90px;
+                top: 40px;
+                left: 40px;
+            }
+
+            .logo-center {
+                width: 55px;
+                height: 55px;
+                top: 57px;
+                left: 57px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #server-name {
+                font-size: 1.7rem;
+                letter-spacing: 3px;
+            }
+
+            #server-subtitle {
+                font-size: 1rem;
+            }
+
+            #loading-logo {
+                width: 140px;
+                height: 140px;
+            }
+
+            .ring-1 {
+                width: 140px;
+                height: 140px;
+            }
+
+            .ring-2 {
+                width: 105px;
+                height: 105px;
+                top: 17px;
+                left: 17px;
+            }
+
+            .ring-3 {
+                width: 70px;
+                height: 70px;
+                top: 35px;
+                left: 35px;
+            }
+
+            .logo-center {
+                width: 45px;
+                height: 45px;
+                top: 47px;
+                left: 47px;
+            }
+
+            #loading-status {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background">
+        <div class="scanlines"></div>
+        <div id="particles"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <div id="container">
+        <div id="header">
+            <h1 id="server-name">Project : Nexus</h1>
+            <p id="server-subtitle">Roleplay Half-Life</p>
+            <p id="server-map"></p>
+        </div>
+
+        <div id="center-content">
+            <div id="loading-logo">
+                <div class="logo-ring ring-1"></div>
+                <div class="logo-ring ring-2"></div>
+                <div class="logo-ring ring-3"></div>
+                <div class="logo-center"></div>
+            </div>
+            <div id="loading-status">Initialisation...</div>
+        </div>
+
+        <div id="bottom-content">
+            <div id="progress-container">
+                <div id="progress-label">Chargement : <span id="progress-percent">0%</span></div>
+                <div id="progress-bar-bg">
+                    <div id="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loadingStatusEl = document.getElementById('loading-status');
+        const progressBar = document.getElementById('progress-bar-fill');
+        const progressPercent = document.getElementById('progress-percent');
+        
+        let totalFiles = 0;
+        let filesNeeded = 0;
+        let currentFileName = '';
+        let gmodConnected = false;
+
+        function updateProgressBar() {
+            if (totalFiles > 0 && filesNeeded >= 0) {
+                const progress = ((totalFiles - filesNeeded) / totalFiles) * 100;
+                progressBar.style.width = progress + '%';
+                progressPercent.textContent = Math.floor(progress) + '%';
+            }
+        }
+
+        window.GameDetails = function(servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language) {
+            gmodConnected = true;
+            
+            if (servername) {
+                document.getElementById('server-name').textContent = servername;
+            }
+            
+            if (mapname) {
+                document.getElementById('server-map').textContent = 'Map : ' + mapname;
+            }
+            
+            if (gamemode) {
+                document.getElementById('server-subtitle').textContent = gamemode.toUpperCase();
+            }
+            
+            loadingStatusEl.textContent = 'Connexion au serveur...';
+        };
+
+        window.SetFilesTotal = function(total) {
+            totalFiles = total;
+            
+            if (total > 0) {
+                loadingStatusEl.textContent = 'Préparation au téléchargement de ' + total + ' fichiers...';
+            }
+            
+            updateProgressBar();
+        };
+
+        window.DownloadingFile = function(fileName) {
+            currentFileName = fileName;
+            const fileNameOnly = fileName.split('/').pop();
+            loadingStatusEl.textContent = 'Téléchargement : ' + fileNameOnly;
+        };
+
+        window.SetStatusChanged = function(status) {
+            loadingStatusEl.textContent = status;
+        };
+
+        window.SetFilesNeeded = function(needed) {
+            filesNeeded = needed;
+            
+            if (needed === 0 && totalFiles > 0) {
+                loadingStatusEl.textContent = 'Téléchargement terminé ! Chargement du jeu...';
+                progressBar.style.width = '100%';
+                progressPercent.textContent = '100%';
+            } else if (totalFiles > 0) {
+                loadingStatusEl.textContent = 'Téléchargement... (' + (totalFiles - needed) + '/' + totalFiles + ')';
+            }
+            
+            updateProgressBar();
+        };
+
+        let simulatedProgress = 0;
+        
+        function simulateLoading() {
+            if (!gmodConnected) {
+                const messages = [
+                    "Synchronisation des flux de données…",
+                    "Établissement de la connexion…",
+                    "Récupération des protocoles…",
+                    "Chargement des ressources…",
+                    "Initialisation de l'interface…",
+                    "Vérification des identifiants…",
+                    "Accès à la base de données…",
+                    "Téléchargement des assets…",
+                    "Connexion au serveur…",
+                    "Préparation de votre arrivée…"
+                ];
+                
+                const messageIndex = Math.floor((simulatedProgress / 100) * messages.length);
+                if (messageIndex < messages.length) {
+                    loadingStatusEl.textContent = messages[messageIndex];
+                }
+                
+                if (simulatedProgress < 100) {
+                    simulatedProgress += Math.random() * 1.2 + 0.4;
+                    if (simulatedProgress > 100) simulatedProgress = 100;
+                    
+                    progressBar.style.width = simulatedProgress + '%';
+                    progressPercent.textContent = Math.floor(simulatedProgress) + '%';
+                } else {
+                    setTimeout(() => {
+                        simulatedProgress = 0;
+                    }, 2000);
+                }
+            }
+        }
+
+        setInterval(simulateLoading, 120);
+
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 60;
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            const size = Math.random() * 2.5 + 1;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            
+            const duration = Math.random() * 12 + 8;
+            particle.style.animation = `floatParticle ${duration}s linear infinite`;
+            
+            particlesContainer.appendChild(particle);
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            createParticle();
+        }
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatParticle {
+                0% {
+                    transform: translate(0, 0) rotate(0deg);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 0.5;
+                }
+                90% {
+                    opacity: 0.5;
+                }
+                100% {
+                    transform: translate(${Math.random() * 250 - 125}px, ${Math.random() * 250 - 125}px) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        loadingStatusEl.textContent = 'Initialisation...';
+    </script>
+</body>
+</html>
